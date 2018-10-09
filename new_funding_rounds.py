@@ -5,13 +5,13 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 #Crunchbase Url download to List of dictionaries.
-'''
+
 user_key = '1b4df7023be98d6b272fd9651e63de31'
 
 url = 'https://api.crunchbase.com/v3.1/excel_export/crunchbase_export.xlsx?user_key=' + user_key
 
 urllib.request.urlretrieve(url, "crunchbase_export.xlsx")
-'''
+
 
 excel_list = []
 book = open_workbook('crunchbase_export.xlsx')
