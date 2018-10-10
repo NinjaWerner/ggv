@@ -3,15 +3,16 @@ from datetime import datetime
 from xlrd import open_workbook
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import tracemalloc
 
 #Crunchbase Url download to List of dictionaries.
-
+'''
 user_key = '1b4df7023be98d6b272fd9651e63de31'
 
 url = 'https://api.crunchbase.com/v3.1/excel_export/crunchbase_export.xlsx?user_key=' + user_key
 
 urllib.request.urlretrieve(url, "crunchbase_export.xlsx")
-
+'''
 
 excel_list = []
 book = open_workbook('crunchbase_export.xlsx')
@@ -46,7 +47,7 @@ us_china_data = sheet_us_china.get_all_records()
 print('Google initialization Done')
 
 '''
-Indi. company data
+Individual company data
 '''
 
 company_sheet = book.sheet_by_index(1)
@@ -62,11 +63,7 @@ company_domains = dict()
 for company in comp_list:
     company_desc_dict[company['company_name']] = company['short_description']
     company_domains[company['company_name']] = company['domain']
-    #founders[company['company_name']] = company['']
 
-
-
-count = 0
 
 
 date_today = excel_list[0]['announced_on']
@@ -104,6 +101,8 @@ def get_inv_lead(investors):
             lead.append(i.split(' - ')[-1])
         else:
             inv.append(i)
+
+
     return inv, lead
 
 
@@ -144,9 +143,10 @@ for fr in excel_list:
             MM = 'Undisclosed'
         inv, lead = get_inv_lead(fr['investor_names'])
 
+        inv, lead = ', '.join(inv), ', '.join(lead)
+
         line = [fr['company_name'], cat, subcat, '', desc, fr['raised_amount_currency_code'], MM, usd_conversion, '',  fr['funding_round_type'], date_crunch_to_master(fr['announced_on']), lead, inv, fr['cb_url'], SEA_country_codes[fr['country_code']], founder, website]
-        sea_writing_list.extend(line)
-        print('Added Sea line')
+        print('Added SEA line: ', fr['company_name'])
         sheet.append_row(line)
 
     # FOR US INDIA CHINA
@@ -200,11 +200,10 @@ for fr in excel_list:
             MM = 'Undisclosed'
             ass = ''
         inv, lead = get_inv_lead(fr['investor_names'])
+        inv, lead = ', '.join(inv), ', '.join(lead)
 
-        #WRITE LINE IN MISSING AND CHECK IT WORK
-        line = [company, cat, subcat, desc, website, oth_country_codes[fr['country_code']], date_crunch_to_master(fr['announced_on']), fr['funding_round_type'], usd_conversion, ass,   founded_date]
-        print('added us line')
+        line = [company, cat, subcat, desc, website,'',  oth_country_codes[fr['country_code']], date_crunch_to_master(fr['announced_on']), fr['funding_round_type'], usd_conversion, ass,   founded_date]
+
+        print('added US or China line')
 
         sheet_us_china.append_row(line)
-
-        # for China, India, SEA
